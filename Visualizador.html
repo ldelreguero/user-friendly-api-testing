@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="es" style="overflow-y: scroll;">
+<head>
+  <meta charset="UTF-8">
+  <title>Visualizador Reporte Postman</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/default.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css"/>
+  <style>
+    /* Reutiliza variables de tema */
+  .theme-dark { --background-color:#222; --bg-card-deck:#444; --text-color:#e3e7eb; --tab-border:solid 1px #444; --success:#3c9372; --failure:#c24a3f; --warning:#d28c23; --info:#4083b6; --badge-outline:#3c9372; --badge-bg:#5a6268; --badge-text:#ffffff; --failure-row:#5a1f1c; --warning-row:#5a4716; --card-bg:#333; --card-footer:#3c4345; --form-input:#2f2f2f; --hov-text:#ffffff; --h4-text:#ffffff; }
+    .theme-light { --tab-border:solid 1px #fff; --text-color:#000; --success:#42a745; --failure:#dc3544; --warning:#f4c10b; --info:#49a1b8; --badge-outline:#040411; --badge-bg:#f8f9fa; --badge-text:#fff; --failure-row:#f5c6cb; --warning-row:#ffeeba; --card-bg:#f7f7f7; --hov-text:#fff; --h4-text:#ffffff; }
+  body { padding-top:30px; background-color:var(--background-color)!important; color:var(--text-color); }
+  body.theme-dark a { color:#57b5ff; }
+  body.theme-dark a:hover { color:#8fd2ff; }
+  body.theme-dark .card { background:var(--card-bg); color:var(--text-color); }
+  body.theme-dark .card-body { background:var(--card-bg); }
+  body.theme-dark .table { color:var(--text-color); }
+  body.theme-dark .table thead th { background:#444; }
+  body.theme-dark .nav-pills .nav-link { color:#fff; }
+    h1 { font-size:1.9rem; }
+    .nav-tabs { padding-top:10px; height:105px; overflow-y:auto; }
+    .card-header { cursor:pointer; }
+    .card-deck { background:var(--bg-card-deck)!important; }
+    .dyn-height { max-height:350px; overflow-y:auto; }
+    .switch { position:relative; display:inline-block; width:44px; height:20px; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#ccc; transition:.4s; }
+    .slider:before { content:""; position:absolute; height:20px; width:20px; left:0; top:0; bottom:0; margin:auto 0; background:white; transition:.4s; box-shadow:0 0 15px #2020203d; }
+    input:checked + .slider { background:#4083b6; }
+    input:checked + .slider:before { transform:translateX(24px); }
+    .slider.round { border-radius:34px; }
+    .slider.round:before { border-radius:50%; }
+    pre { background:#111; color:#eee; padding:10px; border-radius:4px; }
+    .table-sm td, .table-sm th { padding:.3rem; }
+  .progress { height:30px; background:#2b2b2b; }
+  body.theme-dark .progress-bar { font-weight:600; }
+    .text-wrap { word-wrap:break-word; white-space:normal; }
+    .backToTop { display:none; position:fixed; bottom:10px; right:20px; z-index:99; font-size:15px; cursor:pointer; padding:10px 15px; border-radius:4px; }
+  .badge-outline-success { color:var(--success); border:1px solid var(--success); background:transparent; }
+  .card-metric { position:relative; overflow:hidden; border:0; box-shadow:0 2px 4px rgba(0,0,0,.2); }
+  .card-metric .watermark { position:absolute; right:-15px; bottom:-15px; font-size:110px; opacity:.12; transform:rotate(-15deg); }
+  /* Paleta unificada (sin gradientes estridentes) */
+  .metric-it { background:#0d6efd; }
+  .metric-assert { background:#17a2b8; }
+  .metric-fail { background:#dc3545; }
+  .metric-pass { background:#198754; }
+  .metric-rate { background:#6c757d; }
+  /* Encabezado de iteraciones */
+  .iter-header { background:#2f3b52!important; color:#fff; }
+  body.theme-light .iter-header { background:#d8ecff!important; color:#212529; }
+  .iter-header .small-progress { background:#273140; }
+  body.theme-light .iter-header .small-progress { background:#c7e2f9; }
+  .iter-header button.btn-link { color:inherit; }
+  .iter-header button.btn-link:hover { text-decoration:none; filter:brightness(1.05); }
+  .iter-header .small { color:inherit!important; }
+  .iter-header .font-weight-bold { color:inherit!important; }
+  /* Ajuste modo claro: azul suave para diferenciar secciones */
+  body.theme-light .iter-card { background:#f0f7ff; border-color:#b5d6f3!important; }
+  body.theme-light .iter-card .card-body { background:transparent; }
+  /* (Ya redefinido arriba) */
+  body.theme-light .small-progress-bar { color:#0b3d63; }
+  /* ajuste watermark ya definido antes, sin duplicar */
+  /* Colores estáticos pestañas */
+  #pills-tab .nav-link { background:transparent!important; }
+  #pills-tab .nav-link.active { box-shadow:inset 0 -4px 0 rgba(255,255,255,0.25); }
+  #pills-tab .nav-item.bg-info { background:#007bff!important; }
+  #pills-tab .nav-item.bg-success { background:#28a745!important; }
+  #pills-tab .nav-item.bg-danger { background:#dc3545!important; }
+  #pills-tab .nav-item .nav-link { font-weight:500; }
+  body.theme-light .card-metric { color:#fff; }
+  body.theme-dark .card-metric { color:#fff; }
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+  /* Mejoras contraste y estados */
+  .card { border-radius:.5rem; }
+  /* user-select ya definido, se mantiene una sola definición */
+  .card-header:hover { filter:brightness(1.05); }
+  .card.border-info { border-color:#2495c7!important; }
+  body.theme-dark .table-striped tbody tr:nth-of-type(odd){ background-color:#2a2f33; }
+  body.theme-dark .table-striped tbody tr:nth-of-type(even){ background-color:#24282b; }
+  body.theme-dark .table-bordered td, body.theme-dark .table-bordered th { border-color:#3e464b; }
+  a:focus, button:focus { outline:2px dashed #82d2ff; outline-offset:2px; }
+  .btn-outline-success:hover { background:#31b485; color:#fff; }
+  .iter-tools { position:sticky; top:0; z-index:10; background:var(--card-bg); padding:.5rem .5rem .75rem; border-bottom:1px solid #2e2e2e; }
+  body.theme-light .iter-tools { background:#fff; }
+  .small-progress { height:18px; background:#1f1f1f; border-radius:4px; overflow:hidden; }
+  .small-progress-bar { height:100%; line-height:18px; font-size:.7rem; font-weight:600; }
+  body.theme-light .small-progress { background:#e9ecef; }
+  .btn-xs { padding:.25rem .5rem; font-size:.7rem; line-height:1.2; border-radius:.2rem; }
+  .accordion .card { border:1px solid #2f3a3f; }
+  body.theme-light .accordion .card { border-color:#d9e2e6; }
+  .badge-light { color:#222; }
+  body.theme-dark .badge-light { background:#eee; color:#222; }
+  /* Transiciones suaves */
+  .card-metric, .card-header, .progress-bar, .small-progress-bar { transition:all .25s ease; }
+  /* Toast copia */
+  .toast-copia { position:fixed; bottom:15px; left:50%; transform:translateX(-50%); background:#17a2b8; color:#fff; padding:8px 16px; border-radius:20px; font-size:.85rem; opacity:0; pointer-events:none; transition:opacity .3s; z-index:2000; box-shadow:0 4px 12px rgba(0,0,0,.3); }
+  .toast-copia.mostrar { opacity:1; }
+  .copy-url-link { cursor:pointer; text-decoration:underline; word-break:break-all; overflow-wrap:anywhere; white-space:normal; }
+  .copy-url-link:focus, .copy-url-link:hover { text-decoration:none; }
+  /* Bloque de respuesta */
+  .response-toolbar { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:.5rem; }
+  .response-toolbar .btn { padding:.25rem .55rem; font-size:.65rem; }
+  .respuesta-wrapper { position:relative; }
+  .respuesta-pre { max-height:180px; overflow:auto; background:#101418; color:#d8e9f3; padding:.75rem .85rem; border-radius:4px; font-size:.7rem; line-height:1.2; white-space:pre; font-family:Menlo,Consolas,monospace; border:1px solid #25313a; }
+  body.theme-light .respuesta-pre { background:#f1f5f8; color:#132630; border-color:#cfdae0; }
+  .respuesta-pre.expandida { max-height:600px; }
+  .respuesta-pre::-webkit-scrollbar { width:8px; }
+  .respuesta-pre::-webkit-scrollbar-thumb { background:#3a5664; border-radius:4px; }
+  body.theme-light .respuesta-pre::-webkit-scrollbar-thumb { background:#b5c5ce; }
+  .badge-format { background:#445964; font-size:.55rem; letter-spacing:.5px; }
+  body.theme-light .badge-format { background:#b2c7d4; color:#112025; }
+  .badge-hash-change { background:#ffc107; color:#212529; font-size:.55rem; }
+  .badge-flaky { background:#e83e8c; font-size:.55rem; }
+  .badge-size { background:#6c757d; font-size:.55rem; }
+  .code-badge { font-size:.65rem; }
+  /* Skip link accesibilidad */
+  .skip-link { position:absolute; left:-999px; top:auto; width:1px; height:1px; overflow:hidden; }
+  .skip-link:focus { position:static; width:auto; height:auto; padding:.5rem 1rem; background:#17a2b8; color:#fff; z-index:3000; }
+  /* Sparkline */
+  .sparkline { width:70px; height:18px; vertical-align:middle; }
+  .sparkline path { fill:none; stroke:#fff; stroke-width:1.4; }
+  body.theme-light .sparkline path { stroke:#222; }
+  /* Heatmap */
+  .heatmap-table td { text-align:center; font-size:.65rem; padding:.25rem; }
+  .heatmap-legend { font-size:.7rem; }
+  /* Footer */
+  footer { background:var(--card-bg); color:var(--text-color); padding:1rem 0; margin-top:2rem; border-top:1px solid #444; font-size:.8rem; text-align:center; }
+  body.theme-light footer { border-top-color:#dee2e6; }
+  footer .footer-row { display:flex; gap:3rem; margin-bottom:.35rem; justify-content:center; }
+  footer .footer-col { flex:0 1 auto; }
+  footer .footer-title { font-weight:600; margin-bottom:.35rem; }
+  footer .footer-content-text { line-height:1.4; }
+  footer .autor-info { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; justify-content:center; }
+  footer a { color:#57b5ff; text-decoration:none; }
+  footer a:hover { color:#8fd2ff; text-decoration:underline; }
+  body.theme-light footer a { color:#0056b3; }
+  body.theme-light footer a:hover { color:#003d82; }
+  footer .social-links { display:flex; gap:.75rem; }
+  footer .social-links i { margin-right:.25rem; }
+  @media (max-width: 767px) { 
+    footer .footer-row { flex-direction:column; gap:1rem; }
+  }
+  </style>
+</head>
+<body class="theme-dark">
+<a href="#mainContent" class="skip-link">Saltar al contenido principal</a>
+<script>
+  function setTheme(themeName){ localStorage.setItem('theme', themeName); document.body.className=themeName; }
+  function toggleTheme(){ if(localStorage.getItem('theme')==='theme-light'){ setTheme('theme-dark'); } else { setTheme('theme-light'); } }
+  (function(){ setTheme(localStorage.getItem('theme')||'theme-dark'); })();
+</script>
+<main class="container-fluid" id="mainContent" aria-label="Contenido principal del reporte">
+  <div class="d-flex align-items-center mb-3">
+  <span class="mb-0 mr-2">Light</span>
+  <label class="switch mb-0 mr-2" for="slider"><input type="checkbox" onchange="toggleTheme()" id="slider" aria-label="Cambiar tema claro/oscuro"><span class="slider round"></span></label>
+  <span class="mb-0">Dark</span>
+    <div class="ml-auto">
+      <input type="file" id="jsonFile" accept="application/json" class="d-none" />
+  <button class="btn btn-outline-success btn-sm" onclick="document.getElementById('jsonFile').click()" title="Cargar archivo de ejecución JSON"><i class="fas fa-file-upload"></i> Cargar JSON</button>
+  <button class="btn btn-outline-info btn-sm ml-2" id="btnReabrirUltimo" disabled title="Reabrir último JSON cargado"><i class="fa fa-history"></i> Reabrir Último</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div id="mensajeError" class="alert alert-danger mb-2 d-none" role="alert" aria-live="assertive"></div>
+  <ul class="nav nav-pills mb-3 nav-justified" id="pills-tab">
+  <li class="nav-item bg-info active"><a class="nav-link text-white" data-toggle="pill" href="#tab-resumen" role="tab">Resumen</a></li>
+  <li class="nav-item bg-success"><a class="nav-link text-white" data-toggle="pill" href="#tab-detalle" role="tab">Iteraciones</a></li>
+  <li class="nav-item bg-danger"><a class="nav-link text-white" data-toggle="pill" href="#tab-fail" role="tab">Fallidos</a></li>
+      </ul>
+      <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="tab-resumen" role="tabpanel">
+          <div id="resumenContenido" class="p-3">
+            <h1 class="text-center" id="tituloReporte">VISUALIZADOR DE REPORTES DE EJECUCION DE PRUEBAS POSTMAN </h1>
+            <h5 class="text-center" id="fechaEjecucion" aria-live="polite">&nbsp;</h5>
+            <div class="row text-center" id="cardsResumen">
+              <!-- tarjetas resumen -->
+            </div>
+            <hr>
+            <div class="row" id="tablaResumenWrapper" style="display:none;">
+              <div class="col-12">
+                <div class="table-responsive">
+                  <table class="table table-striped table-bordered" id="tablaResumen">
+                    <thead>
+                      <tr class="text-center"><th>Item</th><th>Total</th><th>Fallidos</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="row" id="timingsWrapper" style="display:none;">
+              <div class="col-sm-12 mb-3">
+                <div class="card border-info">
+                  <div class="card-body">
+                    <h5 class="card-title text-uppercase text-white text-center bg-info">Tiempos</h5>
+                    <div id="timingsData"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- Sección de variables eliminada -->
+            </div>
+            <div class="row" id="heatmapWrapper" style="display:none;">
+              <div class="col-12">
+                <div class="card border-info">
+                  <div class="card-body">
+                    <h5 class="card-title text-uppercase text-white text-center bg-info">Heatmap Tiempos</h5>
+                    <div id="heatmapTabla" aria-live="polite"></div>
+                    <div class="heatmap-legend mt-2 text-center">Verde = más rápido, Rojo = más lento</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="tab-detalle" role="tabpanel">
+          <div class="p-2">
+            <h5 id="iteracionesTitulo" class="text-uppercase" aria-live="polite" hidden>Iteraciones</h5>
+            <div id="iterNavWrapper" style="display:none;">
+              <!-- navegación iteraciones eliminada en rediseño -->
+            </div>
+            <div id="listaRequests"></div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="tab-fail" role="tabpanel">
+          <div class="p-3" id="contenidoFallidos"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <div class="footer-col">
+        <div class="footer-title"><i class="fas fa-balance-scale"></i> Licencia</div>
+        <div class="footer-content-text">Proyecto de código abierto. Puedes modificar y adaptar libremente según tus necesidades.</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-title"><i class="fas fa-user"></i> Autor</div>
+        <div class="footer-content-text">
+          <div class="autor-info">
+            <strong>Lucas del Reguero Martínez</strong>
+            <div class="social-links">
+              <a href="https://www.linkedin.com/in/lucas-del-reguero-martinez/" target="_blank" rel="noopener noreferrer" title="LinkedIn de Lucas del Reguero Martínez">
+                <i class="fab fa-linkedin"></i> LinkedIn
+              </a>
+              <a href="https://github.com/ldelreguero" target="_blank" rel="noopener noreferrer" title="GitHub de Lucas del Reguero">
+                <i class="fab fa-github"></i> GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Estructura esperada: JSON de ejecución Postman (similar al que abriste) /* variables DOM */
+// -------------------- Referencias DOM --------------------
+const fileInput = document.getElementById('jsonFile');
+const btnReabrirUltimo = document.getElementById('btnReabrirUltimo');
+// Badges eliminados; dejamos variables nulas para evitar errores si alguna función antigua las usa
+const badgeTotal = null;
+const badgeFail = null;
+const tituloReporteEl = document.getElementById('tituloReporte');
+const listaRequests = document.getElementById('listaRequests');
+const fechaEjecucion = document.getElementById('fechaEjecucion');
+const cardsResumen = document.getElementById('cardsResumen');
+const tablaResumenBody = document.querySelector('#tablaResumen tbody');
+const tablaResumenWrapper = document.getElementById('tablaResumenWrapper');
+const contenidoFallidos = document.getElementById('contenidoFallidos');
+const timingsWrapper = document.getElementById('timingsWrapper');
+const timingsData = document.getElementById('timingsData');
+// Eliminados elementos de environment
+const iterNavWrapper = document.getElementById('iterNavWrapper');
+let totalIteraciones = 1; // derivado de json.count o longitud max de times
+// Modo apilado: no usamos iteracionActual global para vista completa
+// ==================== SECCIÓN REFACTORIZADA ====================
+// Separación de responsabilidades: cálculo, construcción de UI, render principal
+
+function limpiarUI(){
+  listaRequests.innerHTML='';
+  cardsResumen.innerHTML='';
+  tablaResumenBody.innerHTML='';
+  contenidoFallidos.innerHTML='';
+  timingsData.innerHTML='';
+}
+
+function construirTarjetasResumen(metrics){
+  cardsResumen.insertAdjacentHTML('beforeend', crearCard('Total Iteraciones', totalIteraciones));
+  cardsResumen.insertAdjacentHTML('beforeend', crearCard('Total Aserciones', metrics.totalAserciones));
+  cardsResumen.insertAdjacentHTML('beforeend', crearCard('Tests Fallidos', metrics.failed));
+  cardsResumen.insertAdjacentHTML('beforeend', crearCard('Tests Aprobados', metrics.passed));
+  cardsResumen.insertAdjacentHTML('beforeend', crearCard('Porcentaje Éxito', metrics.successRate+'%'));
+}
+
+// Tarjetas extendidas de tiempos (mediana, p95, p99)
+function construirTarjetasTiemposExt(stats){
+  if(!stats || !stats.count) return;
+  // Añadimos iconos/clases opcionales extendiendo mapas locales si se desea; crearCard usa fallback si no existen
+  cardsResumen.insertAdjacentHTML('beforeend', crearCard('Mediana (ms)', stats.median.toFixed(1)));
+  cardsResumen.insertAdjacentHTML('beforeend', crearCard('p95 (ms)', stats.p95.toFixed(1)));
+  cardsResumen.insertAdjacentHTML('beforeend', crearCard('p99 (ms)', stats.p99.toFixed(1)));
+}
+
+function calcularStatsGlobalTiempos(json){
+  const arr=[];
+  (json.results||[]).forEach(r=>{
+    if(Array.isArray(r.times) && r.times.length){ r.times.forEach(t=>{ if(typeof t==='number') arr.push(t); }); }
+    else if(typeof r.time==='number') arr.push(r.time);
+  });
+  return statsSerie(arr);
+}
+
+function construirTablaResumen(metrics, totalRequests){
+  tablaResumenWrapper.style.display='block';
+  const filas = [
+    ['Iteraciones', totalIteraciones, '-'],
+    ['Peticiones', totalRequests, 0],
+    ['Aserciones', metrics.totalAserciones, metrics.failed],
+    ['Éxito (%)', metrics.successRate+'%', '-']
+  ];
+  filas.forEach(f=> tablaResumenBody.insertAdjacentHTML('beforeend', `<tr><td>${f[0]}</td><td class='text-center'>${f[1]}</td><td class='text-center'>${f[2]}</td></tr>`));
+  if(!document.querySelector('#tablaResumen caption')){
+    const caption = document.createElement('caption');
+    caption.className='sr-only';
+    caption.textContent='Resumen de métricas de ejecución';
+    document.getElementById('tablaResumen').prepend(caption);
+  }
+}
+
+function construirTiempos(json){
+  const t = calcularTiempos(json);
+  timingsWrapper.style.display='block';
+  timingsData.innerHTML = `
+    <span><strong>Duración total:</strong> ${(t.totalTimeMs/1000).toFixed(2)} s</span><br>
+    <span><strong>Tiempo promedio por petición:</strong> ${t.avg.toFixed(1)} ms</span><br>
+    <span><strong>Máximo tiempo petición:</strong> ${t.max} ms</span><br>
+    <span><strong>Mínimo tiempo petición:</strong> ${t.min} ms</span><br>
+    <span><strong>Iteraciones:</strong> ${totalIteraciones}</span>`;
+}
+
+// Heatmap tiempos request vs iteraciones
+function construirHeatmap(json){
+  const cont = document.getElementById('heatmapWrapper');
+  const destino = document.getElementById('heatmapTabla');
+  if(!json || !json.results || !destino) return;
+  const rows = [];
+  let globalMin = Infinity, globalMax = -Infinity;
+  json.results.forEach(r=>{
+    const serie = Array.isArray(r.times) ? r.times.slice(0,totalIteraciones) : [r.time];
+    serie.forEach(v=>{
+      if(typeof v !== 'number') return;
+      if(v < globalMin) globalMin = v;
+      if(v > globalMax) globalMax = v;
+    });
+    rows.push({ name:r.name, serie });
+  });
+  if(globalMin === Infinity){ destino.innerHTML='<em>Sin datos de tiempos</em>'; return; }
+  function escala(v){
+    if(globalMax === globalMin) return 0;
+    return (v - globalMin) / (globalMax - globalMin);
+  }
+  let html = '<div class="table-responsive"><table class="table table-sm table-bordered heatmap-table" aria-label="Mapa de calor de tiempos"><thead><tr><th>Request</th>';
+  for(let it=0; it<totalIteraciones; it++) html += `<th>It ${it+1}</th>`;
+  html += '</tr></thead><tbody>';
+  rows.forEach(row=>{
+    html += `<tr><td>${escaparHtml(row.name)}</td>`;
+    for(let it=0; it<totalIteraciones; it++){
+      const val = row.serie[it];
+      if(typeof val!=='number'){ html += '<td>-</td>'; continue; }
+      const norm = escala(val);
+      const hue = (120 - Math.round(norm*120)); // 120=verde,0=rojo
+      const color = `hsl(${hue},70%, ${40 + norm*20}%)`;
+      html += `<td style="background:${color}; color:#fff" title="${val} ms" aria-label="Iteración ${it+1} ${val} ms">${val}</td>`;
+    }
+    html+='</tr>';
+  });
+  html+='</tbody></table></div>';
+  destino.innerHTML = html;
+  cont.style.display='block';
+}
+
+function render(json){
+  limpiarUI();
+  if(!json || !json.results){ fechaEjecucion.textContent='(sin datos)'; return; }
+  fechaEjecucion.textContent = formatearFecha(json.timestamp);
+  prepararIteraciones(json);
+  extraerBodies(json); // detectar cuerpos insertados como tests sintéticos __BODY__
+  extraerReqBodies(json); // detectar cuerpos de request insertados como tests sintéticos __REQBODY__
+  // Intentar extraer URLs por iteración si existen tests sintéticos __URL__ (se ignoran si no hay)
+  if(json && json.results && json.results.some(r=> (r.tests && Object.keys(r.tests).some(k=>k.startsWith('__URL__'))) || (Array.isArray(r.allTests) && r.allTests.some(t=> t && Object.keys(t).some(k=> k.startsWith('__URL__')))))){
+    extraerUrls(json);
+  }
+  // Extraer sub-llamadas (tests sintéticos __SUBCALL__/__SUBTEST__)
+  extraerSubcalls(json);
+  requestStatsCache = calcularStatsRequests(json);
+  const metrics = calcularMetricasGlobales(json);
+  const tiempoStatsExt = calcularStatsGlobalTiempos(json);
+  const totalRequests = json.results.length;
+  construirTarjetasResumen(metrics);
+  construirTarjetasTiemposExt(tiempoStatsExt);
+  construirTablaResumen(metrics, totalRequests);
+  if(tituloReporteEl){
+    // Prioridad: collection.name -> json.name -> fallback genérico
+    const nombreColeccion = (json?.collection && json.collection.name) ? json.collection.name : (json?.name || 'VISUALIZADOR DE REPORTES DE EJECUCION DE PRUEBAS POSTMAN');
+    tituloReporteEl.textContent = nombreColeccion;
+    document.title = nombreColeccion + ' - Reporte';
+  }
+  if(badgeTotal) badgeTotal.textContent = totalRequests;
+  if(badgeFail) badgeFail.textContent = metrics.failed;
+  actualizarListaRequests();
+  construirTiempos(json);
+  construirHeatmap(json);
+  construirFallidos(json, metrics);
+}
+
+// ==================== FIN REFACTORIZACIÓN PRINCIPAL ====================
+
+function formatearFecha(iso){ if(!iso){ return ''; } const d = new Date(iso); return d.toLocaleString(); }
+
+function crearCard(titulo, valor, tipo){
+  const iconos = { 'Total Iteraciones':'fa-sync-alt', 'Total Aserciones':'fa-check-double', 'Tests Fallidos':'fa-times-circle', 'Tests Aprobados':'fa-check-circle', 'Porcentaje Éxito':'fa-percentage' };
+  const clases = { 'Total Iteraciones':'metric-it', 'Total Aserciones':'metric-assert', 'Tests Fallidos':'metric-fail', 'Tests Aprobados':'metric-pass', 'Porcentaje Éxito':'metric-rate' };
+  const icon = iconos[titulo]||'fa-chart-bar';
+  const clase = clases[titulo]||'metric-it';
+  return `<div class="col-lg-3 col-md-6 mb-3"><div class="card card-metric ${clase}"><div class="card-body"><div class="watermark"><i class="fa ${icon}"></i></div><h6 class="text-uppercase mb-1">${titulo}</h6><h1 class="display-4 m-0" style="font-size:2.6rem;">${valor}</h1></div></div></div>`;
+}
+
+// -------------------- Cálculos y utilidades --------------------
+function calcularTiempos(json){
+  const totalTimeMs = json.totalTime || 0; // ms global (cuando lo provee Newman)
+  const totalRequests = json.results?.length || 0;
+  const avg = totalRequests? (totalTimeMs/totalRequests):0;
+  let max = 0, min = Infinity;
+  json.results?.forEach(r=>{ if(typeof r.time==='number'){ if(r.time>max){ max=r.time; } if(r.time<min){ min=r.time; } }});
+  if(min===Infinity) min=0;
+  return { totalTimeMs, totalRequests, avg, max, min };
+}
+
+function calcularMetricasGlobales(json){
+  let totalAserciones=0, passed=0, failed=0;
+  json.results.forEach(r=>{
+    const tests = r.tests||{};
+    Object.entries(tests).forEach(([name,v])=>{
+      if(isSyntheticTest && isSyntheticTest(name)) return;
+      totalAserciones++;
+      if(v){ passed++; } else { failed++; }
+    });
+  });
+  const successRate = totalAserciones? ((passed/totalAserciones)*100).toFixed(1): '0.0';
+  return { totalAserciones, passed, failed, successRate };
+}
+
+// ==================== UTILIDADES NÚCLEO (FASE 1) ====================
+// Detecta tipo probable del body para aplicar formato / badges
+function detectarTipoBody(str){
+  if(str==null) return 'vacio';
+  const s = String(str).trim();
+  if(!s) return 'vacio';
+  if((s.startsWith('{') && s.endsWith('}')) || (s.startsWith('[') && s.endsWith(']'))){ return 'json'; }
+  if(s.startsWith('<') && s.endsWith('>')) return 'xml';
+  const lc = s.toLowerCase();
+  if(lc.startsWith('<?xml')) return 'xml';
+  if(/^[A-Za-z0-9+/=]+$/.test(s) && s.length>24 && s.length%4===0) return 'base64?';
+  if(lc.includes('error') || lc.includes('exception')) return 'texto';
+  return 'texto';
+}
+
+// Pretty JSON seguro sin lanzar excepciones
+function prettyJson(str){
+  if(typeof str !== 'string') return str;
+  const s = str.trim();
+  if(!s) return s;
+  if(!(s.startsWith('{') || s.startsWith('['))) return str;
+  // Heurística simple de indentación sin parsear (evita uso de try/catch)
+  let out='', indent=0; const pad='  ';
+  for(const ch of s){
+    if(ch==='{' || ch==='['){
+      out += ch + '\n';
+      indent++; out += pad.repeat(indent);
+    } else if(ch==='}' || ch===']'){
+      out += '\n'; indent = Math.max(indent-1,0); out += pad.repeat(indent) + ch;
+    } else if(ch===','){
+      out += ch + '\n' + pad.repeat(indent);
+    } else {
+      out += ch;
+    }
+  }
+  return out;
+}
+
+// Estadísticos sobre una serie numérica
+function statsSerie(arr){
+  if(!Array.isArray(arr) || !arr.length) return {count:0, avg:0, min:0, max:0, p95:0, p99:0, median:0};
+  const n = arr.length;
+  let sum=0, min=Infinity, max=-Infinity;
+  for(let i=0;i<n;i++){
+    const v = arr[i];
+    if(typeof v !== 'number') continue;
+    if(v < min) min = v;
+    if(v > max) max = v;
+    sum += v;
+  }
+  if(min===Infinity){ min=0; max=0; }
+  const sorted = arr.slice().sort((a,b)=>a-b);
+  const pct = (p)=>{ const idx = Math.min(sorted.length-1, Math.floor(p*sorted.length)); return sorted[idx]; };
+  const median = sorted.length%2? sorted[(sorted.length-1)/2] : (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2;
+  return {
+    count:n,
+    avg: sum/n,
+    min,
+    max,
+    p95: pct(0.95),
+    p99: pct(0.99),
+    median
+  };
+}
+
+// Calcula stats por request a partir de r.times (ms por iteración)
+function calcularStatsRequests(json){
+  const cache = {};
+  (json.results||[]).forEach(r=>{
+    let serie=[];
+    if(Array.isArray(r.times) && r.times.length){ serie = r.times.filter(t=> typeof t==='number'); }
+    else if(typeof r.time==='number'){ serie=[r.time]; }
+    cache[r.id||r.name] = statsSerie(serie);
+  });
+  return cache;
+}
+
+// Formatea ms a cadena amigable
+function formatTiempo(ms){
+  if(typeof ms !== 'number' || !isFinite(ms)) return '-';
+  if(ms < 1000) return ms.toFixed(0)+' ms';
+  const s = ms/1000;
+  if(s < 60) return s.toFixed(2)+' s';
+  const m = Math.floor(s/60); const rs = (s%60).toFixed(1);
+  return m+'m '+rs+'s';
+}
+
+let requestStatsCache = {}; // se llenará en render para uso posterior (filtros, métricas extendidas)
+let requestFlakyCache = {}; // cache boolean flakiness por request
+const bodyHashPrevPorRequest = {}; // para detectar cambios entre iteraciones
+
+function hashStr(str){
+  if(typeof str !== 'string') return 0;
+  let h=5381, i=str.length;
+  while(i) h = (h*33) ^ str.charCodeAt(--i);
+  return (h>>>0).toString(16);
+}
+
+function esRequestFlaky(r){
+  const key = r.id||r.name;
+  if(requestFlakyCache[key] !== undefined) return requestFlakyCache[key];
+  const porTest = {};
+  // Recorremos todas las iteraciones
+  if(Array.isArray(r.allTests) && r.allTests.length){
+    r.allTests.forEach(testsIter=>{
+      if(!testsIter) return;
+      Object.entries(testsIter).forEach(([nombre, ok])=>{
+        if(nombre.startsWith('__BODY__') || nombre.startsWith('__REQBODY__')) return;
+        if(!porTest[nombre]) porTest[nombre] = {ok:0, fail:0};
+        if(ok) porTest[nombre].ok++; else porTest[nombre].fail++;
+      });
+    });
+  } else if(r.tests){
+    Object.entries(r.tests).forEach(([nombre, ok])=>{
+      if(nombre.startsWith('__BODY__') || nombre.startsWith('__REQBODY__')) return;
+      porTest[nombre] = {ok: ok?1:0, fail: ok?0:1};
+    });
+  }
+  let flaky=false;
+  Object.values(porTest).forEach(v=>{ if(v.ok>0 && v.fail>0) flaky=true; });
+  requestFlakyCache[key]=flaky;
+  return flaky;
+}
+
+function claseStatus(code, failed){
+  if(failed) return 'bg-danger';
+  if(code>=500) return 'bg-danger';
+  if(code>=400) return 'bg-warning';
+  if(code>=300) return 'bg-info';
+  if(code>=200) return 'bg-success';
+  return 'bg-secondary';
+}
+
+function iconoMetodo(m){
+  if(!m) return '<i class="fa fa-question-circle" title="Método desconocido"></i>';
+  const mm = m.toUpperCase();
+  const map = {
+    GET:'fa-arrow-circle-down',
+    POST:'fa-plus-circle',
+    PUT:'fa-edit',
+    PATCH:'fa-wrench',
+    DELETE:'fa-trash-alt',
+    HEAD:'fa-eye',
+    OPTIONS:'fa-list'
+  };
+  const ic = map[mm]||'fa-dot-circle';
+  return `<i class='fa ${ic}' title='${mm}' aria-label='${mm}'></i>`;
+}
+
+function prepararIteraciones(json){
+  const countMeta = json.count && Number.isInteger(json.count) ? json.count : null;
+  let maxTimes = 0;
+  json.results.forEach(r=>{ if(Array.isArray(r.times) && r.times.length>maxTimes) maxTimes=r.times.length; });
+  totalIteraciones = countMeta || maxTimes || 1;
+}
+
+// ==================== EXTRAER CUERPOS OPCIÓN 1 ====================
+function extraerBodies(json){
+  const PREFIX='__BODY__';
+  json.results.forEach(r=>{
+    r.bodyByIteration = r.bodyByIteration || {};
+    // Escanear tests globales (una sola iteración)
+    if(r.tests){
+      Object.keys(r.tests).forEach(k=>{ if(k.startsWith(PREFIX)){ procesarClaveBody(r,k,0); delete r.tests[k]; } });
+    }
+    if(r.testPassFailCounts){
+      Object.keys(r.testPassFailCounts).forEach(k=>{ if(k.startsWith(PREFIX)){ procesarClaveBody(r,k,0); delete r.testPassFailCounts[k]; } });
+    }
+    // Escanear allTests por iteración
+    if(Array.isArray(r.allTests)){
+      r.allTests.forEach((obj, itIdx)=>{
+        if(!obj) return;
+        Object.keys(obj).forEach(k=>{
+          if(!k.startsWith(PREFIX)) return;
+          procesarClaveBody(r,k,itIdx);
+          delete obj[k];
+        });
+      });
+    }
+  });
+}
+
+// ==================== EXTRAER REQUEST BODIES (tests sintéticos __REQBODY__) ====================
+function extraerReqBodies(json){
+  const PREFIX='__REQBODY__';
+  json.results.forEach(r=>{
+    r.reqBodyByIteration = r.reqBodyByIteration || {};
+    // Escanear tests globales (una sola iteración)
+    if(r.tests){
+      Object.keys(r.tests).forEach(k=>{ if(k.startsWith(PREFIX)){ procesarClaveReqBody(r,k,0); delete r.tests[k]; } });
+    }
+    if(r.testPassFailCounts){
+      Object.keys(r.testPassFailCounts).forEach(k=>{ if(k.startsWith(PREFIX)){ procesarClaveReqBody(r,k,0); delete r.testPassFailCounts[k]; } });
+    }
+    // Escanear allTests por iteración
+    if(Array.isArray(r.allTests)){
+      r.allTests.forEach((obj, itIdx)=>{
+        if(!obj) return;
+        Object.keys(obj).forEach(k=>{
+          if(!k.startsWith(PREFIX)) return;
+          procesarClaveReqBody(r,k,itIdx);
+          delete obj[k];
+        });
+      });
+    }
+  });
+}
+
+// ==================== EXTRAER URLS POR ITERACIÓN (tests sintéticos __URL__) ====================
+function extraerUrls(json){
+  const PREFIX='__URL__';
+  if(!json || !Array.isArray(json.results)) return;
+  json.results.forEach(r=>{
+    r.urlByIteration = r.urlByIteration || {};
+    if(r.tests){
+      Object.keys(r.tests).forEach(k=>{ if(k.startsWith(PREFIX)){ procesarClaveUrl(r,k,0); delete r.tests[k]; } });
+    }
+    if(r.testPassFailCounts){
+      Object.keys(r.testPassFailCounts).forEach(k=>{ if(k.startsWith(PREFIX)){ procesarClaveUrl(r,k,0); delete r.testPassFailCounts[k]; } });
+    }
+    if(Array.isArray(r.allTests)){
+      r.allTests.forEach((obj,itIdx)=>{
+        if(!obj) return;
+        Object.keys(obj).forEach(k=>{ 
+          if(!k.startsWith(PREFIX)) return; 
+          procesarClaveUrl(r,k,itIdx); 
+          delete obj[k]; 
+        });
+      });
+    }
+  });
+}
+function procesarClaveUrl(r,key,defaultIter){
+  const parts = key.split('__');
+  if(parts.length < 5) return;
+  const reqId = parts[2];
+  let iter = parseInt(parts[3],10); if(isNaN(iter)) iter = defaultIter;
+  const b64 = parts.slice(4).join('__');
+  if(reqId===r.id || reqId==='undefined' || !reqId){
+    r.urlByIteration[iter] = decodeBase64Utf8(b64);
+  }
+}
+function obtenerUrlIter(r,itIndex){
+  if(r.urlByIteration && r.urlByIteration[itIndex] !== undefined) return r.urlByIteration[itIndex];
+  return r.url;
+}
+
+// ==================== EXTRAER SUBCALLS (tests sintéticos __SUBCALL__/__SUBTEST__) ====================
+function extraerSubcalls(json){
+  if(!json || !Array.isArray(json.results)) return;
+  const REG_SUBCALL = /^__SUBCALL__([A-Z]+)__(\d+)__(IN|OUT)__(.+)$/;
+  const REG_SUBTEST = /^__SUBTEST__([A-Z]+)__(\d+)__(.+)$/;
+  json.results.forEach(r=>{
+    r.subcallsByIteration = r.subcallsByIteration || {};
+    // Helper para obtener/crear subcall por iteración+tipo+bloque
+    function getSubcall(it, tipo, bloque){
+      if(!r.subcallsByIteration[it]) r.subcallsByIteration[it] = [];
+      let sc = r.subcallsByIteration[it].find(x=> x.tipo===tipo && x.bloque===bloque);
+      if(!sc){ sc = { tipo, bloque, inXml:null, outXml:null, tests:[] }; r.subcallsByIteration[it].push(sc); }
+      return sc;
+    }
+    function procesarObjetoTests(obj, itIdx){
+      if(!obj) return;
+      Object.keys(obj).forEach(k=>{
+        const mSubcall = k.match(REG_SUBCALL);
+        if(mSubcall){
+          const [, tipo, bloque, fase, b64] = mSubcall;
+          const sc = getSubcall(itIdx, tipo, bloque);
+          const contenido = decodeBase64Utf8(b64);
+          if(fase==='IN') sc.inXml = contenido; else sc.outXml = contenido;
+          delete obj[k];
+          return; // siguiente clave
+        }
+        const mSubtest = k.match(REG_SUBTEST);
+        if(mSubtest){
+          const [, tipo, bloque, nombreTest] = mSubtest;
+          const sc = getSubcall(itIdx, tipo, bloque);
+          sc.tests.push({ nombre:nombreTest, ok: !!obj[k] });
+          delete obj[k];
+        }
+      });
+    }
+    // tests globales (iteración 0)
+    procesarObjetoTests(r.tests, 0);
+    if(Array.isArray(r.allTests)){
+      r.allTests.forEach((obj,itIdx)=> procesarObjetoTests(obj, itIdx));
+    }
+    // Ordenar cada iteración por bloque numérico
+    Object.keys(r.subcallsByIteration).forEach(it=>{
+      r.subcallsByIteration[it].sort((a,b)=> parseInt(a.bloque,10) - parseInt(b.bloque,10));
+    });
+  });
+}
+
+function procesarClaveBody(r, key, defaultIter){
+  const parts = key.split('__');
+  if(parts.length < 5) return;
+  const reqId = parts[2];
+  let iter = parseInt(parts[3],10);
+  if(isNaN(iter)) iter = defaultIter;
+  const b64 = parts.slice(4).join('__');
+  if(reqId===r.id || reqId==='undefined' || !reqId){
+    r.bodyByIteration[iter] = decodeBase64Utf8(b64);
+  }
+}
+
+function procesarClaveReqBody(r, key, defaultIter){
+  const parts = key.split('__');
+  if(parts.length < 5) return;
+  const reqId = parts[2];
+  let iter = parseInt(parts[3],10);
+  if(isNaN(iter)) iter = defaultIter;
+  const b64 = parts.slice(4).join('__');
+  if(reqId===r.id || reqId==='undefined' || !reqId){
+    r.reqBodyByIteration[iter] = decodeBase64Utf8(b64);
+  }
+}
+
+function decodeBase64Utf8(b64){
+  if(typeof b64 !== 'string' || !b64) return '';
+  if(!/^[-A-Za-z0-9+/=]+$/.test(b64)) return '(base64 no válido)';
+  if(b64.length % 4 !== 0) return '(padding base64 inválido)';
+  if(typeof atob !== 'function') return '(atob no disponible)';
+  // atob podría lanzar en entornos no estándar; asumimos soporte dado el navegador
+  const raw = atob(b64);
+  // Intento de reinterpretar como UTF-8 sin usar try/catch: detectamos presencia de bytes extendidos
+  // Si no hay caracteres > 0x7F retornamos tal cual
+  let needsDecode = false;
+  for(let i=0;i<raw.length;i++){ if(raw.charCodeAt(i) > 0x7F){ needsDecode = true; break; } }
+  if(!needsDecode) return raw;
+  // Fallback manual simple: convertir a bytes y ensamblar (soporta UTF-8 básico 2 bytes)
+  const bytes = new Array(raw.length);
+  for(let i=0;i<raw.length;i++) bytes[i] = raw.charCodeAt(i);
+  return ensamblarUtf8Basico(bytes, raw);
+}
+
+function ensamblarUtf8Basico(bytes, fallback){
+  let out='';
+  let i=0; const len = bytes.length;
+  while(i < len){
+    const b = bytes[i];
+    if(b < 0x80){ out += String.fromCharCode(b); i++; continue; }
+    if((b & 0xE0) === 0xC0){
+      if(i+1 >= len) return fallback;
+      const b2 = bytes[i+1];
+      out += String.fromCharCode(((b & 0x1F)<<6) | (b2 & 0x3F));
+      i += 2; continue;
+    }
+    if((b & 0xF0) === 0xE0){
+      if(i+2 >= len) return fallback;
+      const b2 = bytes[i+1];
+      const b3 = bytes[i+2];
+      out += String.fromCharCode(((b & 0x0F)<<12) | ((b2 & 0x3F)<<6) | (b3 & 0x3F));
+      i += 3; continue;
+    }
+    return fallback; // secuencia no soportada
+  }
+  return out;
+}
+
+// ==================== FALLIDOS ====================
+function construirFallidos(json, metrics){
+  if(metrics.failed===0){
+    contenidoFallidos.innerHTML = `<div class='alert alert-success text-center'><h4>No hay tests fallidos <i class='far fa-thumbs-up'></i></h4></div>`;
+    return;
+  }
+  let html = '<div class="table-responsive"><table class="table table-sm table-bordered table-striped"><thead><tr class="text-center"><th>#</th><th>Request</th><th>Iteración</th><th>Test</th><th>Estado</th></tr></thead><tbody>';
+  let row=0;
+  json.results.forEach((r, rIdx)=>{
+    // Para cada iteración reconstruimos tests
+    for(let it=0; it<totalIteraciones; it++){
+      let testsIter = r.tests || {};
+      if(Array.isArray(r.allTests) && r.allTests[it]) testsIter = r.allTests[it];
+      Object.entries(testsIter).forEach(([nombre, ok])=>{
+        if(isSyntheticTest && isSyntheticTest(nombre)) return;
+        if(!ok){
+          row++;
+            html += `<tr><td class='text-center'>${row}</td><td>${escaparHtml(r.name)}</td><td class='text-center'>${it+1}</td><td>${escaparHtml(nombre)}</td><td class='text-center bg-danger text-white'>FALLÓ</td></tr>`;
+        }
+      });
+    }
+  });
+  html += '</tbody></table></div>';
+  contenidoFallidos.innerHTML = html;
+}
+
+// (Línea de referencias eliminada: funciones ya integradas inline)
+
+function actualizarListaRequests(){
+  listaRequests.innerHTML='';
+  // Barra de herramientas iteraciones
+  // Siempre mostrar toolbar de iteraciones
+  const tools = document.createElement('div');
+  tools.className='iter-tools mb-2';
+  tools.innerHTML = `<div class='d-flex flex-wrap align-items-center'>
+    <strong class='mr-3'>Iteraciones (${totalIteraciones})</strong>
+    <button class='btn btn-outline-info btn-xs mr-2' id='btnExpandAll' type='button' aria-label='Expandir todas las iteraciones'><i class='fa fa-plus-square'></i> Expandir Todas</button>
+    <button class='btn btn-outline-secondary btn-xs mr-2' id='btnCollapseAll' type='button' aria-label='Colapsar todas las iteraciones'><i class='fa fa-minus-square'></i> Colapsar Todas</button>
+    <button class='btn btn-outline-success btn-xs' id='btnExpandReqs' type='button' aria-label='Expandir todas las peticiones'><i class='fa fa-level-down-alt'></i> Expandir Requests</button>
+    <button class='btn btn-outline-warning btn-xs ml-2' id='btnCollapseReqs' type='button' aria-label='Colapsar todas las peticiones'><i class='fa fa-level-up-alt'></i> Colapsar Requests</button>
+  </div>`;
+  listaRequests.appendChild(tools);
+  setTimeout(()=>bindIterTools(),0);
+  for(let it=0; it<totalIteraciones; it++) listaRequests.appendChild(crearSeccionIteracion(it));
+}
+
+function crearSeccionIteracion(itIndex){
+  const wrapper = document.createElement('div');
+  wrapper.className='mb-3';
+  let tiempoTotal=0, testsTot=0, testsOk=0, testsFail=0;
+  currentJson.results.forEach(r=>{
+    if(Array.isArray(r.times) && r.times[itIndex]!==undefined) tiempoTotal += r.times[itIndex];
+    const tObj = (Array.isArray(r.allTests) && r.allTests[itIndex]) ? r.allTests[itIndex] : (r.tests || {});
+    Object.entries(tObj).forEach(([name, v])=>{
+      if(isSyntheticTest && isSyntheticTest(name)) return; // ignorar tests sintéticos
+      testsTot++;
+      if(v) testsOk++; else testsFail++;
+    });
+  });
+  const prom = currentJson.results.length? (tiempoTotal/currentJson.results.length).toFixed(1):0;
+  const successRate = testsTot? (testsOk/testsTot*100).toFixed(1):'0.0';
+  const collapseId = `iter-${itIndex}-body`;
+  // Color dinámico con mejor contraste: 0% rojo (0), 100% verde (120)
+  const pctNum = parseFloat(successRate) || 0;
+  const hue = Math.round((pctNum/100)*120); // 0..120
+  // Reducimos la luminosidad base para que el texto blanco contraste mejor y sólo aclaramos ligeramente.
+  const sat = 72; // saturación moderada
+  const light = 35 + (pctNum/100)*15; // 35% (0%) -> 50% (100%)
+  const barColorInline = `hsl(${hue}, ${sat}%, ${light}%)`;
+  // Selección de color de texto según luminosidad calculada
+  const textColor = light > 46 ? '#0f1f16' : '#ffffff';
+  wrapper.innerHTML = `
+    <div class='card border-info iter-card'>
+      <div class='card-header iter-header' style='cursor:pointer;'>
+        <button class='btn btn-link p-0 text-left w-100 text-decoration-none' data-toggle='collapse' data-target='#${collapseId}' aria-expanded='false' aria-controls='${collapseId}' title='Alternar iteración ${itIndex+1}'>
+        <div class='d-flex flex-column flex-md-row justify-content-between w-100'>
+          <span class='font-weight-bold mb-1 mb-md-0'>Iteración ${itIndex+1}</span>
+          <span class='small'>Tiempo total: ${tiempoTotal} ms | Promedio req: ${prom} ms | Éxito: ${successRate}% (${testsOk}/${testsTot})${testsFail? ' | Fallidos: '+testsFail:''}</span>
+        </div>
+        <div class='small-progress mt-2'>
+          <div class='small-progress-bar' style='background:${barColorInline}; width:${successRate}%; color:${textColor};'>${successRate}%</div>
+        </div>
+        </button>
+      </div>
+      <div id='${collapseId}' class='collapse'>
+        <div class='card-body p-2'>
+          <div class='accordion' id='accordion-it-${itIndex}'></div>
+        </div>
+      </div>
+    </div>`;
+  const acc = wrapper.querySelector(`#accordion-it-${itIndex}`);
+  // Lazy: se cargarán los requests al expandir la iteración
+  acc.setAttribute('data-loaded','0');
+  acc.setAttribute('data-it', itIndex);
+  return wrapper;
+}
+
+// (Definición duplicada de render eliminada: usar la versión refactorizada superior)
+
+function obtenerBodyIter(r, itIndex){
+  if(r.bodyByIteration && r.bodyByIteration[itIndex] !== undefined) return r.bodyByIteration[itIndex];
+  if(Array.isArray(r.allResponses) && r.allResponses[itIndex]) return r.allResponses[itIndex];
+  if(r.responseBody) return r.responseBody;
+  if(r.response) return r.response;
+  return '';
+}
+
+function infoTestsIter(r, itIndex){
+  let testsIter = r.tests || {};
+  if(Array.isArray(r.allTests) && r.allTests[itIndex]) testsIter = r.allTests[itIndex];
+  const entries = Object.entries(testsIter||{}).filter(([n,_])=> !(isSyntheticTest && isSyntheticTest(n)));
+  const total = entries.length;
+  const passed = entries.filter(([_,v])=>v).length;
+  return { testsIter, entries, total, passed, failed: total - passed };
+}
+
+function construirHeaderRequest(r, idx, itIndex, meta){
+  const { failed, total, passed, timeMs, sizeHum, hash, changed, flaky, metodo, claseHeader } = meta;
+  const idCollapse = `it${itIndex}-req-${idx}`;
+  const spark = generarSparkline(r.times);
+  return `
+    <div class='card-header ${claseHeader}'>
+      <button class='btn btn-link text-white p-0 d-block w-100 text-left' data-toggle='collapse' data-target='#${idCollapse}' aria-expanded='false' aria-controls='${idCollapse}' title='Alternar petición ${r.name} iteración ${itIndex+1}'>
+        <div class='d-flex flex-wrap align-items-center justify-content-between'>
+          <span>${idx+1}. ${iconoMetodo(metodo)} ${escaparHtml(r.name)} <small class='text-monospace'>(${metodo||'?'})</small></span>
+          <span>
+            <span class='badge badge-light code-badge' title='Código HTTP'>${r.responseCode.code}</span>
+            <span class='badge badge-size' title='Tamaño cuerpo estimado'>${sizeHum}</span>
+            <span class='badge badge-dark' title='Hash cuerpo'>${hash.slice(0,6)}</span>
+            ${changed? `<span class='badge badge-hash-change' title='Body cambió respecto a iteración previa'>CAMBIO</span>`:''}
+            ${flaky? `<span class='badge badge-flaky' title='Request con tests inestables (flaky)'>FLAKY</span>`:''}
+            <span class='badge badge-${failed? 'danger':'success'}' title='Tests aprobados / total'>${passed}/${total}</span>
+            <span class='badge badge-info' title='Tiempo ms iteración'>${timeMs} ms</span>
+            ${spark}
+          </span>
+        </div>
+        <i class='fa fa-chevron-down float-right' aria-hidden='true'></i><span class='sr-only'>Mostrar/ocultar detalle</span>
+      </button>
+    </div>`;
+}
+
+function crearAcordeonRequest(r, idx, itIndex){
+  const card = document.createElement('div'); card.className='card mb-2';
+  const idCollapse = `it${itIndex}-req-${idx}`;
+  const { testsIter, total, passed, failed } = infoTestsIter(r, itIndex);
+  let timeMs = r.time;
+  if(Array.isArray(r.times) && r.times[itIndex] !== undefined) timeMs = r.times[itIndex];
+  const { htmlRespuesta } = crearHtmlRespuesta(r, itIndex, idx);
+  const { htmlRequestBody } = crearHtmlRequestBody(r, itIndex, idx);
+  const flaky = esRequestFlaky(r);
+  const bodyStr = String(obtenerBodyIter(r, itIndex) || '');
+  const sizeBytes = bodyStr.length;
+  const hash = hashStr(bodyStr);
+  const keyReq = r.id||r.name; const prev = bodyHashPrevPorRequest[keyReq]; const changed = prev && prev !== hash; bodyHashPrevPorRequest[keyReq] = hash;
+  const sizeHum = sizeBytes < 1024 ? sizeBytes+' B' : (sizeBytes/1024).toFixed(1)+' KB';
+  const metodo = metodoRequest(r.id);
+  const claseHeader = claseStatus(r.responseCode?.code, failed);
+  // --- Métricas sub-llamadas si existen ---
+  let headerMetrics = { failed, total, passed };
+  let tieneSubcalls = false;
+  if(r.subcallsByIteration && r.subcallsByIteration[itIndex] && r.subcallsByIteration[itIndex].length){
+    tieneSubcalls = true;
+    let scTotal=0, scPassed=0, scFailed=0;
+    r.subcallsByIteration[itIndex].forEach(sc=>{
+      const t = sc.tests.length;
+      const p = sc.tests.filter(x=>x.ok).length;
+      scTotal += t; scPassed += p; scFailed += (t-p);
+    });
+    headerMetrics = { failed: scFailed, total: scTotal, passed: scPassed };
+  }
+  const headerHtml = construirHeaderRequest(r, idx, itIndex, { failed:headerMetrics.failed, total:headerMetrics.total, passed:headerMetrics.passed, timeMs, sizeHum, hash, changed, flaky, metodo, claseHeader });
+  // URL por iteración (si existe test sintético __URL__) o estática
+  const urlIter = obtenerUrlIter(r, itIndex);
+  const urlRaw = urlIter || '';
+  const urlAttr = escaparHtml(urlRaw);
+  // Decodificar y formatear XML_INPUT directamente bajo la URL
+  let xmlInputBlock = '';
+  let urlText = urlRaw; // versión visible (decodificada cuando aplica)
+  try {
+    const urlObj = new URL(urlRaw, window.location.origin);
+    const rawXmlParam = urlObj.searchParams.get('XML_INPUT');
+    // Construir versión visible de todos los parámetros decodificados
+    const paramsVisible = [];
+    urlObj.searchParams.forEach((v,k)=>{
+      if(k==='XML_INPUT'){
+        try{
+          const dec = decodeURIComponent(v);
+          paramsVisible.push(`${k}=${dec}`);
+        }catch{ paramsVisible.push(`${k}=${v}`); }
+      } else {
+        try{
+          paramsVisible.push(`${k}=${decodeURIComponent(v)}`);
+        }catch{ paramsVisible.push(`${k}=${v}`); }
+      }
+    });
+    const baseVisible = urlObj.origin + urlObj.pathname;
+    urlText = paramsVisible.length ? baseVisible + '?' + paramsVisible.join('&') : baseVisible;
+    if(rawXmlParam){
+      const decoded = decodeURIComponent(rawXmlParam);
+      if(/^<.*>$/.test(decoded.trim())){
+        xmlInputBlock = `<div class='mt-1'><strong>XML_INPUT:</strong><pre class='respuesta-pre small p-2 mt-1' style='max-height:300px;'>${escaparHtml(prettyXml(decoded))}</pre></div>`;
+      } else {
+        xmlInputBlock = `<div class='mt-1'><strong>XML_INPUT:</strong> <code>${escaparHtml(decoded)}</code></div>`;
+      }
+    }
+  } catch(e){ if(window && window.console){ console.debug('No se pudo parsear XML_INPUT/URL para vista decodificada:', e); } }
+  const mostrarTestsGenerales = !(tieneSubcalls); // ocultar tabla general si hay subcalls
+  card.innerHTML = headerHtml + `
+    <div id='${idCollapse}' class='collapse'>
+      <div class='card-body'>
+        <div class='row'>
+          <div class='col-md-${mostrarTestsGenerales? '6':'12'}'>
+            <h6 class='text-uppercase'>Información de la Petición</h6>
+            <p><strong>Método:</strong> ${metodo}<br><strong>URL:</strong> <a href='${urlAttr}' class='text-wrap d-inline-block copy-url-link' data-url='${urlAttr}' style='word-break:break-all;' title='Copiar URL al portapapeles'>${escaparHtml(urlText)}</a><br><strong>Tiempo (ms) iteración:</strong> ${timeMs}<br><strong>Tamaño cuerpo:</strong> ${sizeHum}<br><strong>Hash:</strong> ${hash}</p>
+            ${tieneSubcalls ? '' : xmlInputBlock}
+            ${tieneSubcalls ? '' : htmlRequestBody}
+            ${tieneSubcalls ? '' : htmlRespuesta}
+            ${renderSubcalls(r,itIndex)}
+          </div>
+          ${mostrarTestsGenerales? `<div class='col-md-6'>
+            <h6 class='text-uppercase'>Tests</h6>
+            <div class='progress mb-2' role='progressbar' aria-valuenow='${passed}' aria-valuemin='0' aria-valuemax='${total}' aria-label='Progreso de tests de la petición'>
+              <div class='progress-bar bg-${failed? 'danger':'success'}' style='width:${ total? (passed/total*100).toFixed(0):0 }%'>${passed}/${total}<span class='sr-only'> Tests aprobados de ${total}</span></div>
+            </div>
+            ${renderTablaTests(testsIter)}
+          </div>`: ''}
+        </div>
+      </div>
+    </div>`;
+  return card;
+}
+
+function generarSparkline(times){
+  if(!Array.isArray(times) || times.length<2) return '';
+  const vals = times.filter(t=> typeof t==='number');
+  if(vals.length<2) return '';
+  const min = Math.min(...vals); const max = Math.max(...vals);
+  const h = 16, w = 70;
+  const step = w / (vals.length-1);
+  const points = vals.map((v,i)=>{
+    const norm = (v - min)/(max - min || 1);
+    const y = h - norm*h;
+    const x = i*step;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg class='sparkline' viewBox='0 0 ${w} ${h}' role='img' aria-label='Serie tiempos'><polyline points='${points}' fill='none' stroke='currentColor' stroke-width='1.2'/></svg>`;
+}
+
+function seleccionarBody(r, itIndex){
+  if(r.bodyByIteration && r.bodyByIteration[itIndex] !== undefined) return {body:r.bodyByIteration[itIndex], injected:true};
+  if(Array.isArray(r.allResponses) && r.allResponses[itIndex]) return {body:r.allResponses[itIndex], injected:false};
+  if(r.responseBody) return {body:r.responseBody, injected:false};
+  if(r.response) return {body:r.response, injected:false};
+  return {body:'(sin cuerpo de respuesta disponible)', injected:false};
+}
+
+function diffIterAnterior(r, itIndex, actual){
+  if(itIndex<=0) return '';
+  let prev=null;
+  if(r.bodyByIteration && r.bodyByIteration[itIndex-1]!==undefined) prev = r.bodyByIteration[itIndex-1];
+  else if(Array.isArray(r.allResponses) && r.allResponses[itIndex-1]) prev = r.allResponses[itIndex-1];
+  if(prev==null) return '';
+  return String(prev) !== String(actual) ? `<span class='badge badge-hash-change ml-1' title='Diferente a iteración previa'>DIFF</span>` : '';
+}
+
+function formatearBody(raw){
+  if(raw==null) return '';
+  const s = String(raw).trim();
+  if(!s) return s;
+  // Caso especial: XML con un <string> cuyo contenido viene HTML-escapado (&lt;...&gt;)
+  // Ejemplo: <string> &lt;MsgOutput&gt;...&lt;/MsgOutput&gt; </string>
+  if(/<string[\s\S]*?>[\s\S]*&lt;[\s\S]*<\/string>/i.test(s)){
+    const m = s.match(/(<string[^>]*>)([\s\S]*?)(<\/string>)/i);
+    if(m){
+      const open = m[1];
+      const innerEscaped = m[2];
+      const close = m[3];
+      // Decodificar entidades básicas
+      const decodedInner = innerEscaped
+        .replace(/&lt;/g,'<')
+        .replace(/&gt;/g,'>')
+        .replace(/&amp;/g,'&')
+        .replace(/&quot;/g,'"')
+        .replace(/&apos;/g,"'");
+      if(/<[^>]+>/.test(decodedInner.trim())){
+        // Formatear el XML interno
+        const prettyInner = prettyXml(decodedInner.trim());
+        const indentInner = prettyInner.split('\n').map(l=>'  '+l).join('\n');
+        return [open, indentInner, close].join('\n');
+      }
+    }
+  }
+  if(s.startsWith('<') && s.endsWith('>')) return prettyXml(s);
+  if(detectarTipoBody(s)==='json') return prettyJson(s);
+  return s;
+}
+
+function crearHtmlRespuesta(r, itIndex, idx){
+  const sel = seleccionarBody(r, itIndex);
+  const rawResp = sel.body;
+  const formatted = formatearBody(rawResp);
+  const respId = `resp-${itIndex}-${idx}`;
+  // Asegurar escapado consistente del contenido mostrado (formatted ya es texto plano, pero volver a escapar evita riesgos si formatearBody en el futuro retorna algo con < >)
+  const formattedEsc = escaparHtml(formatted);
+  const html = `<div class='mt-3 mb-1'><strong>RESPUESTA:</strong></div><div class='respuesta-wrapper'><pre id='${respId}' class='respuesta-pre' data-expanded='0'>${formattedEsc}</pre></div>`;
+  return { htmlRespuesta: html, respId };
+}
+
+function seleccionarReqBody(r, itIndex){
+  if(r.reqBodyByIteration && r.reqBodyByIteration[itIndex] !== undefined) return {body:r.reqBodyByIteration[itIndex], injected:true};
+  return {body:'(sin cuerpo de petición disponible)', injected:false};
+}
+
+function crearHtmlRequestBody(r, itIndex, idx){
+  const sel = seleccionarReqBody(r, itIndex);
+  const rawReq = sel.body;
+  const formatted = formatearBody(rawReq);
+  const reqId = `req-${itIndex}-${idx}`;
+  // Asegurar escapado consistente del contenido mostrado
+  const formattedEsc = escaparHtml(formatted);
+  const html = `<div class='mt-3 mb-1'><strong>REQUEST BODY:</strong></div><div class='respuesta-wrapper'><pre id='${reqId}' class='respuesta-pre' data-expanded='0'>${formattedEsc}</pre></div>`;
+  return { htmlRequestBody: html, reqId };
+}
+
+function prettyXml(xml){
+  if(typeof xml !== 'string') return '';
+  xml = xml.replace(/>\s*</g,'>\n<');
+  const lines = xml.split('\n');
+  let indent=0; const pad='  ';
+  return lines.map(raw=>{
+    const line = raw.trim();
+    if(!line) return '';
+    if(/^<\//.test(line)){
+      indent = Math.max(indent-1,0);
+    }
+    const out = pad.repeat(indent)+line;
+    if(/^<[^!?][^>]*[^/]>$/.test(line) && !/^<\//.test(line)){
+      indent++;
+    }
+    return out;
+  }).join('\n');
+}
+
+// -------------------- Herramientas de expansión/colapso --------------------
+function bindIterTools(){
+
+  const btnExpandAll = document.getElementById('btnExpandAll');
+  const btnCollapseAll = document.getElementById('btnCollapseAll');
+  const btnExpandReqs = document.getElementById('btnExpandReqs');
+  const btnCollapseReqs = document.getElementById('btnCollapseReqs');
+  if(btnExpandAll) btnExpandAll.addEventListener('click', ()=>toggleAllIter(true));
+  if(btnCollapseAll) btnCollapseAll.addEventListener('click', ()=>toggleAllIter(false));
+  if(btnExpandReqs) btnExpandReqs.addEventListener('click', ()=>toggleAllReqs(true));
+  if(btnCollapseReqs) btnCollapseReqs.addEventListener('click', ()=>toggleAllReqs(false));
+}
+function toggleAllIter(expand){
+  for(let it=0; it<totalIteraciones; it++){
+    const el = document.getElementById(`iter-${it}-body`);
+    if(!el) continue;
+    $(el).collapse(expand? 'show':'hide');
+    if(expand) cargarIteracionSiNecesario(it); // asegurar carga si expandimos todas
+  }
+}
+function toggleAllReqs(expand){
+  // Recorre todos los acordeones de requests
+  document.querySelectorAll('[id^="it"][id*="-req-"]').forEach(collapse=>{
+    $(collapse).collapse(expand? 'show':'hide');
+  });
+}
+
+function renderTablaTests(tests){
+  if(!tests) return '<em>Sin tests</em>';
+  let rows='';
+  Object.entries(tests).forEach(([n,ok])=>{
+    if(isSyntheticTest && isSyntheticTest(n)) return;
+    rows += `<tr><td>${n}</td><td class='text-center ${ok? 'bg-success text-white':'bg-danger text-white'}'>${ok? 'OK':'FALLÓ'}</td></tr>`;
+  });
+  return `<table class='table table-sm table-bordered'><thead><tr><th>Nombre</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function metodoRequest(id){ const col = currentJson?.collection?.requests || []; const f = col.find(x=>x.id===id); return f? f.method:'?'; }
+
+let currentJson = null;
+const mensajeError = document.getElementById('mensajeError');
+
+function mostrarError(msg){
+  if(!mensajeError) return;
+  mensajeError.textContent = msg;
+  mensajeError.classList.remove('d-none');
+}
+function limpiarError(){ if(mensajeError){ mensajeError.classList.add('d-none'); mensajeError.textContent=''; } }
+
+function normalizarTextoJson(txt){
+  if(typeof txt !== 'string') return txt;
+  // Remover BOM inicial si existe
+  if(txt.charCodeAt(0) === 0xFEFF) txt = txt.slice(1);
+  // Eliminar caracteres de control excepto \n, \r, \t mediante recorrido para evitar regex con rangos problemáticos
+  let limpio = '';
+  for(let i=0;i<txt.length;i++){
+    const code = txt.charCodeAt(i);
+    if(code < 32 && code !== 10 && code !== 13 && code !== 9) continue;
+    limpio += txt[i];
+  }
+  return limpio;
+}
+
+function parseExecutionJson(raw){
+  let txt = normalizarTextoJson(raw);
+  try { return JSON.parse(txt); } catch(e1){
+    // Reintento: eliminar posibles caracteres sobrantes al final (por ejemplo coma extra) de forma simple
+    const trimmed = txt.trim().replace(/,\s*([}\]])/g,'$1');
+    try { return JSON.parse(trimmed); } catch(e2){
+      console.error('Fallo parseo JSON:', e1, e2);
+      return null;
+    }
+  }
+}
+
+fileInput.addEventListener('change', (e)=>{
+  const file=e.target.files[0]; if(!file){ return; }
+  limpiarError();
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    const parsed = parseExecutionJson(ev.target.result);
+    if(!parsed){ mostrarError('JSON inválido: no se pudo parsear el archivo.'); return; }
+  // Persistencia simple (si storage disponible)
+  if(window.localStorage){ localStorage.setItem('reporte_postman_last_json', ev.target.result); }
+    habilitarBtnReabrir();
+    currentJson = parsed; render(currentJson);
+  };
+  reader.readAsText(file);
+});
+
+function habilitarBtnReabrir(){
+  if(!btnReabrirUltimo) return;
+  const existe = !!localStorage.getItem('reporte_postman_last_json');
+  btnReabrirUltimo.disabled = !existe;
+}
+habilitarBtnReabrir();
+
+if(btnReabrirUltimo){
+  btnReabrirUltimo.addEventListener('click', ()=>{
+    const raw = localStorage.getItem('reporte_postman_last_json');
+    if(!raw){ mostrarToast('No hay JSON previo'); return; }
+    const parsed = parseExecutionJson(raw);
+    if(!parsed){ mostrarToast('JSON previo corrupto'); return; }
+    currentJson = parsed; render(currentJson); mostrarToast('Reabierto');
+  });
+}
+
+// Botón Demo eliminado
+
+// Código de environment eliminado
+
+// -------------------- Copia al portapapeles de URL --------------------
+// Creamos toast una sola vez
+const toast = document.createElement('div');
+toast.className='toast-copia';
+toast.setAttribute('role','status');
+toast.setAttribute('aria-live','polite');
+toast.setAttribute('aria-atomic','true');
+toast.textContent='Copiado';
+document.body.appendChild(toast);
+
+function mostrarToast(msg){
+  toast.textContent = msg || 'Copiado';
+  toast.classList.add('mostrar');
+  clearTimeout(mostrarToast._t);
+  mostrarToast._t = setTimeout(()=> toast.classList.remove('mostrar'), 1600);
+}
+
+// Delegación de eventos para enlaces de copia
+document.addEventListener('click', function(e){
+  const a = e.target.closest('a.copy-url-link');
+  if(!a) return;
+  e.preventDefault(); // evitamos navegación
+  const url = a.getAttribute('data-url') || a.getAttribute('href');
+  if(!url) return;
+  // Usar API Async Clipboard si existe
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=> mostrarToast('URL copiada')).catch(()=> fallbackCopy(url));
+  } else {
+    fallbackCopy(url);
+  }
+});
+
+// Referencias no ejecutadas (comentadas) para evitar eliminaciones automáticas por herramientas: 
+// console.debug('utilidades respuesta', getResponseForIteration, formatearRespuesta);
+
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.top='-1000px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); mostrarToast('URL copiada'); } catch(err){ console.warn('No se pudo copiar', err); mostrarToast('No se pudo copiar'); }
+  document.body.removeChild(ta);
+}
+
+// Escapar caracteres especiales para mostrar URL completa sin interpretación HTML
+function escaparHtml(str){
+  if(str==null) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function isSyntheticTest(name){
+  return name.startsWith('__BODY__') || name.startsWith('__REQBODY__') || name.startsWith('__URL__') || name.startsWith('__SUBCALL__') || name.startsWith('__SUBTEST__');
+}
+
+// ==================== RENDER SUBCALLS ====================
+function labelTipoSubcall(tipo){
+  const map = { CONF:'Confirmación', CONC:'Conciliación', ANUL:'Anulación', CONCPA:'Conciliación Post Anulación' };
+  return map[tipo] || tipo;
+}
+function renderSubcalls(r,itIndex){
+  if(!r.subcallsByIteration || !r.subcallsByIteration[itIndex] || !r.subcallsByIteration[itIndex].length) return '';
+  let html = `<div class='mt-3'><h6 class='text-uppercase'>Sub-llamadas</h6>`;
+  r.subcallsByIteration[itIndex].forEach(sc=>{
+    // Conteo tests
+    // Salvaguarda: deduplicar por nombre conservando estado (falla si alguna instancia falla)
+    const map = {};
+    sc.tests.forEach(t=>{ if(!map[t.nombre]) map[t.nombre] = t.ok; else map[t.nombre] = map[t.nombre] && t.ok; });
+    const dedupTests = Object.keys(map).sort().map(n=>({ nombre:n, ok:map[n] }));
+    sc.tests = dedupTests; // actualizar estructura para usos posteriores
+    const total = dedupTests.length;
+    const passed = dedupTests.filter(t=>t.ok).length;
+    const failed = total - passed;
+    function formatContenido(raw){
+      if(!raw) return '';
+      const trimmed = String(raw).trim();
+      if(trimmed.startsWith('<') && trimmed.endsWith('>')) return escaparHtml(prettyXml(trimmed));
+      if(detectarTipoBody(trimmed)==='json') return escaparHtml(prettyJson(trimmed));
+      return escaparHtml(trimmed);
+    }
+    const inHtml = sc.inXml? `<pre class='respuesta-pre small mb-1'>${formatContenido(sc.inXml)}</pre>`: '<em class="text-muted">(sin IN)</em>';
+    const outHtml = sc.outXml? `<pre class='respuesta-pre small mb-1'>${formatContenido(sc.outXml)}</pre>`: '<em class="text-muted">(sin OUT)</em>';
+    let testsHtml = '';
+    if(total){
+      testsHtml = `<table class='table table-sm table-bordered mb-1'><thead><tr><th>Test</th><th class='text-center'>Estado</th></tr></thead><tbody>` +
+        dedupTests.map(t=>`<tr><td>${escaparHtml(t.nombre)}</td><td class='text-center ${t.ok? 'bg-success text-white':'bg-danger text-white'}'>${t.ok? 'OK':'FALLÓ'}</td></tr>`).join('') + '</tbody></table>';
+    } else {
+      testsHtml = '<em class="text-muted">(sin tests)</em>';
+    }
+    html += `<div class='border rounded p-2 mb-2 subcall-block'>
+      <div class='d-flex justify-content-between align-items-center mb-1'>
+        <strong>${escaparHtml(labelTipoSubcall(sc.tipo))} - Bloque ${escaparHtml(sc.bloque)}</strong>
+        <span class='badge badge-${failed? 'danger':'success'}' title='Tests sub-llamada'>${passed}/${total}</span>
+      </div>
+      <div><small class='text-info'>IN</small>${inHtml}</div>
+      <div><small class='text-info'>OUT</small>${outHtml}</div>
+      <div class='mt-1'>${testsHtml}</div>
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+// parseJsonSafe eliminado por simplificación
+
+// -------------------- Delegación toolbar de respuesta --------------------
+document.addEventListener('click', delegarToolbarRespuesta);
+
+function delegarToolbarRespuesta(e){
+  const btn = e.target.closest('[data-action][data-target]');
+  if(!btn) return;
+  const action = btn.getAttribute('data-action');
+  const targetId = btn.getAttribute('data-target');
+  const pre = document.getElementById(targetId);
+  if(!pre) return;
+  switch(action){
+    case 'copy-response':
+      copiarTexto(pre.textContent, 'Respuesta copiada');
+      break;
+    case 'download-response':
+      descargarTexto(pre.textContent, 'response.txt');
+      break;
+    case 'toggle-expand-response':
+      toggleExpand(pre);
+      break;
+    case 'open-modal-response':
+      mostrarModalRespuesta(pre.textContent);
+      break;
+    case 'copy-response-base64':
+      copiarBase64(pre.textContent);
+      break;
+  }
+}
+
+function copiarTexto(texto, okMsg){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(texto).then(()=> mostrarToast(okMsg)).catch(()=> fallbackCopy(texto));
+  } else { fallbackCopy(texto); }
+}
+function descargarTexto(contenido, nombre){
+  const blob = new Blob([contenido], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=nombre; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=> URL.revokeObjectURL(url), 500);
+}
+function toggleExpand(pre){
+  const expanded = pre.getAttribute('data-expanded')==='1';
+  if(expanded){ pre.classList.remove('expandida'); pre.setAttribute('data-expanded','0'); }
+  else { pre.classList.add('expandida'); pre.setAttribute('data-expanded','1'); }
+}
+function copiarBase64(txt){
+  const b64 = btoa(unescape(encodeURIComponent(txt)));
+  copiarTexto(b64, 'Base64 copiado');
+}
+
+// ==================== Lazy Render ====================
+function cargarIteracionSiNecesario(itIndex){
+  const acc = document.querySelector(`#accordion-it-${itIndex}`);
+  if(!acc || acc.getAttribute('data-loaded')==='1') return;
+  currentJson.results.forEach((r,i)=> acc.appendChild(crearAcordeonRequest(r,i,itIndex)) );
+  acc.setAttribute('data-loaded','1');
+}
+// Pre-carga antes del primer show para evitar que el primer despliegue quede vacío
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('[data-toggle="collapse"]');
+  if(!btn) return;
+  const target = btn.getAttribute('data-target');
+  if(!target || !/^#iter-\d+-body$/.test(target)) return;
+  const it = parseInt(target.split('-')[1],10);
+  if(!isNaN(it)) cargarIteracionSiNecesario(it);
+}, true); // capture para ejecutar antes que Bootstrap calcule tamaños
+document.addEventListener('show.bs.collapse', (ev)=>{
+  const id = ev.target && ev.target.id;
+  if(!id || !/^iter-\d+-body$/.test(id)) return;
+  const parts = id.split('-');
+  const it = parseInt(parts[1],10);
+  if(!isNaN(it)) cargarIteracionSiNecesario(it);
+});
+
+// Modal simple reutilizable
+let modalRespEl = null;
+function crearModalBase(){
+  const div = document.createElement('div');
+  div.innerHTML = `<div class='modal fade' id='modalRespuesta' tabindex='-1' role='dialog' aria-hidden='true'>
+    <div class='modal-dialog modal-xl modal-dialog-scrollable' role='document'>
+      <div class='modal-content'>
+        <div class='modal-header'>
+          <h5 class='modal-title'>Respuesta Completa</h5>
+          <button type='button' class='close' data-dismiss='modal' aria-label='Cerrar'>
+            <span aria-hidden='true'>&times;</span>
+          </button>
+        </div>
+        <div class='modal-body'><pre id='modalRespuestaPre' style='max-height:70vh; overflow:auto; font-size:.75rem; background:#111; color:#eee; padding:1rem; border-radius:4px;'></pre></div>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(div.firstChild);
+  modalRespEl = document.getElementById('modalRespuesta');
+}
+function mostrarModalRespuesta(texto){
+  if(!modalRespEl) crearModalBase();
+  const pre = document.getElementById('modalRespuestaPre');
+  if(pre) pre.textContent = texto;
+  // Usar jQuery modal
+  if(window.$) $('#modalRespuesta').modal('show');
+}
+
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+</body>
+</html>

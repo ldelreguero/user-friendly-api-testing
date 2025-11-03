@@ -33,7 +33,7 @@ Un framework completo de dos componentes diseñado con ayuda de IA (ChatGPT y Gi
 
 - **`Postman Echo.postman_collection.json`**: Colección de ejemplo con requests HTTP (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). Incluye scripts de test y post-procesamiento para guardar información relevante de cada request y response.
 - **`Postman Echo.postman_test_run.json`**: Ejemplo de archivo de resultados exportado desde Postman (Runner / Collection Run). Contiene el log estructurado de cada request, tests ejecutados y sus resultados; es el insumo que consume el visualizador HTML para generar métricas, comparaciones y reportes.
-- **`script.md`**: Documentación del script de test/post-response para Postman, que extrae y codifica información de requests y responses en tests sintéticos.
+- **`script.js`**: Documentación del script de test/post-response para Postman, que extrae y codifica información de requests y responses en tests sintéticos.
 - **`Visualizador.html`**: Visualizador HTML interactivo para analizar resultados de ejecución de colecciones Postman. Soporta métricas, comparación de iteraciones, detección de flakiness y visualización de diferencias.
 
 ## 🚀 Cómo Usar
@@ -42,7 +42,7 @@ Un framework completo de dos componentes diseñado con ayuda de IA (ChatGPT y Gi
 
 1. **Prepara tu colección de Postman:**
    - Importa tu colección de Postman o usa `Postman Echo.postman_collection.json` como ejemplo
-   - Inserta el post-response script de `script.md` a nivel de colección
+   - Inserta el post-response script de `script.js` a nivel de colección
 
 ### Flujo de Pruebas
 
@@ -83,7 +83,7 @@ Un framework completo de dos componentes diseñado con ayuda de IA (ChatGPT y Gi
 
 ## 🔧 Scripts de Postman
 
-El script incluido en `script.md` realiza automáticamente:
+El script incluido en `script.js` realiza automáticamente:
 - Guarda la URL completa de cada request en un test sintético (`__URL__...`)
 - Guarda el body de la request y de la response (`__REQBODY__...`, `__BODY__...`)
 - Codifica los datos en Base64 para evitar problemas de caracteres

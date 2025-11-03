@@ -1,0 +1,567 @@
+{
+	"info": {
+		"_postman_id": "ced742cd-bfa8-40ca-bae2-f74317062cb2",
+		"name": "Postman Echo",
+		"description": "Postman Echo is a service you can use to test your REST clients and make sample API calls. It provides endpoints for `GET`, `POST`, `PUT`, various auth mechanisms and other utility endpoints.\n\nThe documentation for the endpoints as well as example responses can be found at [https://postman-echo.com](https://postman-echo.com/?source=echo-collection-app-onboarding)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7750291",
+		"_collection_link": "https://k27test.postman.co/workspace/CTA---Chile~d2f9dc3e-d3e5-4a57-8fd5-3f85cacec102/collection/7750291-ced742cd-bfa8-40ca-bae2-f74317062cb2?action=share&source=collection_link&creator=7750291"
+	},
+	"item": [
+		{
+			"name": "Request Methods",
+			"item": [
+				{
+					"name": "GET Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response body has json with request queries\", function () {",
+									"    pm.response.to.have.jsonBody('args.foo1', 'bar1')",
+									"        .and.have.jsonBody('args.foo2', 'bar2');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"connection": true,
+							"accept-encoding": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://postman-echo.com/get?foo1=bar1&foo2=bar2",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"get"
+							],
+							"query": [
+								{
+									"key": "foo1",
+									"value": "bar1"
+								},
+								{
+									"key": "foo2",
+									"value": "bar2"
+								}
+							]
+						},
+						"description": "The HTTP `GET` request method is meant to retrieve data from a server. The data  \nis identified by a unique URI (Uniform Resource Identifier).\n\nA `GET` request can pass parameters to the server using \"Query String  \nParameters\". For example, in the following request,\n\n> [http://example.com/hi/there?hand=wave](http://example.com/hi/there?hand=wave) \n  \n\nThe parameter \"hand\" has the value \"wave\".\n\nThis endpoint echoes the HTTP headers, request parameters and the complete  \nURI requested."
+					},
+					"response": [
+						{
+							"name": "GET Request Woops",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://postman-echo.com/get?foo1=bar1&foo2=bar2",
+									"protocol": "https",
+									"host": [
+										"postman-echo",
+										"com"
+									],
+									"path": [
+										"get"
+									],
+									"query": [
+										{
+											"key": "foo1",
+											"value": "bar1"
+										},
+										{
+											"key": "foo2",
+											"value": "bar2"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 11 Jun 2019 10:43:13 GMT"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"161-aLhNcsGArlgLSKbxPqfBW3viHPI\""
+								},
+								{
+									"key": "Server",
+									"value": "nginx"
+								},
+								{
+									"key": "set-cookie",
+									"value": "sails.sid=s%3AGz-wblZgXE8FCDq7aJpx_tUgZUcG3Nsw.LdNEN8L0C7nGWkvGLwvdw6R2s6Syjr%2FzkvyevA8qR0c; Path=/; HttpOnly"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "Content-Length",
+									"value": "249"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"args\": {\n        \"foo1\": \"bar1\",\n        \"foo2\": \"bar2\"\n    },\n    \"headers\": {\n        \"x-forwarded-proto\": \"https\",\n        \"host\": \"postman-echo.com\",\n        \"accept\": \"*/*\",\n        \"accept-encoding\": \"gzip, deflate\",\n        \"cache-control\": \"no-cache\",\n        \"postman-token\": \"5c27cd7d-6b16-4e5a-a0ef-191c9a3a275f\",\n        \"user-agent\": \"PostmanRuntime/7.6.1\",\n        \"x-forwarded-port\": \"443\"\n    },\n    \"url\": \"https://postman-echo.com/get?foo1=bar1&foo2=bar2\"\n}"
+						}
+					]
+				},
+				{
+					"name": "POST Raw Text",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response body has json with request body\", function () {",
+									"    pm.response.to.have.jsonBody('data', ",
+									"        'This is expected to be sent back as part of response body.');",
+									"});",
+									"",
+									"pm.test(\"testing method\", function () {",
+									"    const requestBody = {",
+									"    \"test\": \"value\"",
+									"    };",
+									"",
+									"    pm.sendRequest({",
+									"        url: pm.request.url,",
+									"        method: pm.request.method,",
+									"        headers: pm.request.headers,",
+									"        body: {",
+									"            mode: 'raw',",
+									"            raw: JSON.stringify(requestBody)",
+									"        }",
+									"    }, function (err, res) {",
+									"        console.log('rahul', res.json());",
+									"    })",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"test\": \"value\"\n}"
+						},
+						"url": {
+							"raw": "https://postman-echo.com/post",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"post"
+							]
+						},
+						"description": "The HTTP `POST` request method is meant to transfer data to a server \n(and elicit a response). What data is returned depends on the implementation\nof the server.\n\nA `POST` request can pass parameters to the server using \"Query String \nParameters\", as well as the Request Body. For example, in the following request,\n\n> POST /hi/there?hand=wave\n>\n> <request-body>\n\nThe parameter \"hand\" has the value \"wave\". The request body can be in multiple\nformats. These formats are defined by the MIME type of the request. The MIME \nType can be set using the ``Content-Type`` HTTP header. The most commonly used \nMIME types are:\n\n* `multipart/form-data`\n* `application/x-www-form-urlencoded`\n* `application/json`\n\nThis endpoint echoes the HTTP headers, request parameters, the contents of\nthe request body and the complete URI requested."
+					},
+					"response": []
+				},
+				{
+					"name": "POST Form Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response body has json with form data\", function () {",
+									"    pm.response.to.have.jsonBody('form.foo1', 'bar1')",
+									"        .and.have.jsonBody('form.foo2', 'bar2');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "foo1",
+									"value": "bar1",
+									"type": "text"
+								},
+								{
+									"key": "foo2",
+									"value": "bar2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://postman-echo.com/post",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"post"
+							]
+						},
+						"description": "The HTTP `POST` request method is meant to transfer data to a server \n(and elicit a response). What data is returned depends on the implementation\nof the server.\n\nA `POST` request can pass parameters to the server using \"Query String \nParameters\", as well as the Request Body. For example, in the following request,\n\n> POST /hi/there?hand=wave\n>\n> <request-body>\n\nThe parameter \"hand\" has the value \"wave\". The request body can be in multiple\nformats. These formats are defined by the MIME type of the request. The MIME \nType can be set using the ``Content-Type`` HTTP header. The most commonly used \nMIME types are:\n\n* `multipart/form-data`\n* `application/x-www-form-urlencoded`\n* `application/json`\n\nThis endpoint echoes the HTTP headers, request parameters, the contents of\nthe request body and the complete URI requested when data is sent as a form parameter."
+					},
+					"response": [
+						{
+							"name": "POST Form Data",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "foo1",
+											"value": "bar1",
+											"type": "text"
+										},
+										{
+											"key": "foo2",
+											"value": "bar2",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://postman-echo.com/post",
+									"protocol": "https",
+									"host": [
+										"postman-echo",
+										"com"
+									],
+									"path": [
+										"post"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 06 Feb 2023 09:32:50 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "541"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"21d-xfFK76757VvHgzzscqtMAqpVMD8\""
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "set-cookie",
+									"value": "sails.sid=s%3A2_ZQ2_JOXHPJpdYeKx8H9Vl7cWGbHQRb.RYNjk0CqTPQJ%2FkAXEcFxGeHIJrNStXm9Nxi8ib0wcDI; Path=/; HttpOnly"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"args\": {},\n    \"data\": \"\",\n    \"files\": {},\n    \"form\": {\n        \"foo1\": \"bar1\",\n        \"foo2\": \"bar2\"\n    },\n    \"headers\": {\n        \"x-forwarded-proto\": \"https\",\n        \"x-forwarded-port\": \"443\",\n        \"host\": \"postman-echo.com\",\n        \"x-amzn-trace-id\": \"Root=1-63e0c942-584c7dab4a1c52d34d581b03\",\n        \"content-length\": \"19\",\n        \"user-agent\": \"PostmanRuntime/7.30.1\",\n        \"accept\": \"*/*\",\n        \"cache-control\": \"no-cache\",\n        \"postman-token\": \"159c6495-8e5f-4ce0-bacd-ac399a86ec03\",\n        \"accept-encoding\": \"gzip, deflate, br\",\n        \"content-type\": \"application/x-www-form-urlencoded\"\n    },\n    \"json\": {\n        \"foo1\": \"bar1\",\n        \"foo2\": \"bar2\"\n    },\n    \"url\": \"https://postman-echo.com/post\"\n}"
+						}
+					]
+				},
+				{
+					"name": "PUT Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response body has json with form data\", function () {",
+									"    pm.response.to.have.jsonBody('data', ",
+									"        'This is expected to be sent back as part of response body.');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "This is expected to be sent back as part of response body."
+						},
+						"url": {
+							"raw": "https://postman-echo.com/put",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"put"
+							]
+						},
+						"description": "The HTTP `PUT` request method is similar to HTTP `POST`. It too is meant to \ntransfer data to a server (and elicit a response). What data is returned depends on the implementation\nof the server.\n\nA `PUT` request can pass parameters to the server using \"Query String \nParameters\", as well as the Request Body. For example, in the following \nraw HTTP request,\n\n> PUT /hi/there?hand=wave\n>\n> <request-body>\n\n\n"
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response body has json with form data\", function () {",
+									"    pm.response.to.have.jsonBody('data', ",
+									"        'This is expected to be sent back as part of response body.');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "This is expected to be sent back as part of response body."
+						},
+						"url": {
+							"raw": "https://postman-echo.com/patch",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"patch"
+							]
+						},
+						"description": "The HTTP `PATCH` method is used to update resources on a server. The exact\nuse of `PATCH` requests depends on the server in question. There are a number\nof server implementations which handle `PATCH` differently. Technically, \n`PATCH` supports both Query String parameters and a Request Body.\n\nThis endpoint accepts an HTTP `PATCH` request and provides debug information\nsuch as the HTTP headers, Query String arguments, and the Request Body."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response body has json with form data\", function () {",
+									"    pm.response.to.have.jsonBody('data', ",
+									"        'This is expected to be sent back as part of response body.');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "This is expected to be sent back as part of response body."
+						},
+						"url": {
+							"raw": "https://postman-echo.com/delete",
+							"protocol": "https",
+							"host": [
+								"postman-echo",
+								"com"
+							],
+							"path": [
+								"delete"
+							]
+						},
+						"description": "The HTTP `DELETE` method is used to delete resources on a server. The exact\nuse of `DELETE` requests depends on the server implementation. In general, \n`DELETE` requests support both, Query String parameters as well as a Request \nBody.\n\nThis endpoint accepts an HTTP `DELETE` request and provides debug information\nsuch as the HTTP headers, Query String arguments, and the Request Body."
+					},
+					"response": []
+				}
+			],
+			"description": "HTTP has multiple request \"verbs\", such as `GET`, `PUT`, `POST`, `DELETE`,  \n`PATCH`, `HEAD`, etc.\n\nAn HTTP Method (verb) defines how a request should be interpreted by a server.  \nThe endpoints in this section demonstrate various HTTP Verbs. Postman supports  \nall the HTTP Verbs, including some rarely used ones, such as `PROPFIND`, `UNLINK`,  \netc.\n\nFor details about HTTP Verbs, refer to [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9)"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					"// ================================\r",
+					"// Guardar URL de la request\r",
+					"// ================================\r",
+					"(function () {\r",
+					"    try {\r",
+					"        const rawUrl = pm.request && pm.request.url ? pm.request.url.toString() : '';\r",
+					"        const MAX = 2000;\r",
+					"        const recorte = rawUrl.length > MAX ? rawUrl.slice(0, MAX) + '...[TRUNCADO]' : rawUrl;\r",
+					"        const base64 = btoa(unescape(encodeURIComponent(recorte)));\r",
+					"        const reqId = (pm.request && pm.request.id) ? pm.request.id : 'undefined';\r",
+					"        const iter = pm.info && typeof pm.info.iteration !== 'undefined' ? pm.info.iteration : 0;\r",
+					"        const testName = `__URL__${reqId}__${iter}__${base64}`;\r",
+					"\r",
+					"        pm.test(testName, function () {\r",
+					"            pm.expect(true).to.be.true;\r",
+					"        });\r",
+					"    } catch (e) {\r",
+					"        console.log('Error creando test __URL__', e);\r",
+					"    }\r",
+					"})();\r",
+					"\r",
+					"// ================================\r",
+					"// Guardar body de la request\r",
+					"// ================================\r",
+					"(function () {\r",
+					"    try {\r",
+					"        let rawBody = '';\r",
+					"\r",
+					"        if (pm.request.body) {\r",
+					"            switch (pm.request.body.mode) {\r",
+					"                case 'raw':\r",
+					"                    rawBody = pm.request.body.raw;\r",
+					"                    break;\r",
+					"                case 'urlencoded':\r",
+					"                    rawBody = pm.request.body.urlencoded\r",
+					"                        .map(item => `${item.key}=${item.value}`)\r",
+					"                        .join('&');\r",
+					"                    break;\r",
+					"                case 'formdata':\r",
+					"                    rawBody = pm.request.body.formdata\r",
+					"                        .map(item => `${item.key}=${item.value || ''}`)\r",
+					"                        .join('&');\r",
+					"                    break;\r",
+					"                default:\r",
+					"                    rawBody = '';\r",
+					"            }\r",
+					"        }\r",
+					"\r",
+					"        const MAX = 4000;\r",
+					"        const recorte = rawBody.length > MAX ? rawBody.slice(0, MAX) + '...[TRUNCADO]' : rawBody;\r",
+					"        const base64 = btoa(unescape(encodeURIComponent(recorte)));\r",
+					"        const reqId = (pm.request && pm.request.id) ? pm.request.id : 'undefined';\r",
+					"        const iter = pm.info && typeof pm.info.iteration !== 'undefined' ? pm.info.iteration : 0;\r",
+					"        const testName = `__REQBODY__${reqId}__${iter}__${base64}`;\r",
+					"\r",
+					"        pm.test(testName, function () {\r",
+					"            pm.expect(true).to.be.true;\r",
+					"        });\r",
+					"    } catch (e) {\r",
+					"        console.log('Error creando test __REQBODY__', e);\r",
+					"    }\r",
+					"})();\r",
+					"\r",
+					"// ================================\r",
+					"// Guardar body de la response\r",
+					"// ================================\r",
+					"(function () {\r",
+					"    try {\r",
+					"        const raw = pm.response.text() || '';\r",
+					"        const MAX = 4000;\r",
+					"        const recorte = raw.length > MAX ? raw.slice(0, MAX) + '...[TRUNCADO]' : raw;\r",
+					"        const base64 = btoa(unescape(encodeURIComponent(recorte)));\r",
+					"        const testName = `__BODY__${pm.request.id}__${pm.info.iteration}__${base64}`;\r",
+					"\r",
+					"        pm.test(testName, function () {\r",
+					"            pm.expect(true).to.be.true;\r",
+					"        });\r",
+					"    } catch (e) {\r",
+					"        console.log('Error creando test __BODY__', e);\r",
+					"    }\r",
+					"})();\r",
+					""
+				]
+			}
+		}
+	]
+}

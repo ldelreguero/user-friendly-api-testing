@@ -14,21 +14,16 @@ En muchos proyectos, especialmente en sistemas legacy, las pruebas no están ins
 
 ### 💡 La Solución
 
-Un framework completo de tres componentes diseñado con ayuda de IA (ChatGPT y GitHub Copilot) que permite a cualquier persona probar APIs usando herramientas familiares:
+Un framework completo de dos componentes diseñado con ayuda de IA (ChatGPT y GitHub Copilot) que permite a cualquier persona probar APIs usando herramientas familiares:
 
-#### 1. **Generador de Dataset en Excel** 📊
-- Archivo Excel diseñado con términos y estructuras del negocio
-- Macro que transforma automáticamente los datos en JSON para Postman
-- Cada hoja representa un escenario de prueba diferente
-- Sin necesidad de conocer estructura de requests, bodies o endpoints
 
-#### 2. **Colección de Postman Lista para Usar** 📮
+#### 1. **Colección de Postman Lista para Usar** 📮
 - Endpoints predefinidos con estructura de requests y tests
 - Scripts automáticos que registran información relevante de cada prueba
-- Importa el dataset generado desde Excel y ejecuta
+- Ejecuta
 - Todo el historial de pruebas se guarda automáticamente
 
-#### 3. **Visualizador HTML Interactivo** 📊
+#### 2. **Visualizador HTML Interactivo** 📊
 - Transforma el JSON crudo de Postman en reportes claros y visuales
 - Cualquier persona puede analizar resultados sin experiencia técnica
 - Detecta diferencias entre pruebas, respuestas inesperadas y tendencias
@@ -37,9 +32,9 @@ Un framework completo de tres componentes diseñado con ayuda de IA (ChatGPT y G
 ## 📁 Archivos Incluidos
 
 - **`Postman Echo.postman_collection.json`**: Colección de ejemplo con requests HTTP (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`). Incluye scripts de test y post-procesamiento para guardar información relevante de cada request y response.
+- **`Postman Echo.postman_test_run.json`**: Ejemplo de archivo de resultados exportado desde Postman (Runner / Collection Run). Contiene el log estructurado de cada request, tests ejecutados y sus resultados; es el insumo que consume el visualizador HTML para generar métricas, comparaciones y reportes.
 - **`script.md`**: Documentación del script de test/post-response para Postman, que extrae y codifica información de requests y responses en tests sintéticos.
-- **`Visualizador_v3.html`**: Visualizador HTML interactivo para analizar resultados de ejecución de colecciones Postman. Soporta métricas, comparación de iteraciones, detección de flakiness y visualización de diferencias.
-- **`objetivo.md`**: Documento que describe el contexto, motivación y beneficios del proyecto.
+- **`Visualizador.html`**: Visualizador HTML interactivo para analizar resultados de ejecución de colecciones Postman. Soporta métricas, comparación de iteraciones, detección de flakiness y visualización de diferencias.
 
 ## 🚀 Cómo Usar
 
@@ -70,7 +65,7 @@ Un framework completo de tres componentes diseñado con ayuda de IA (ChatGPT y G
 
 ### Para Usuarios Funcionales
 - ✅ Prueban con sus propios casos sin depender de IT
-- ✅ Usan herramientas familiares (Excel)
+- ✅ Usan herramientas familiares (Excel por ejemplo para crear datasets a través de macros)
 - ✅ Generan evidencias comprensibles
 - ✅ Detectan problemas antes de producción
 

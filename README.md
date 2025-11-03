@@ -48,7 +48,7 @@ Un framework completo de dos componentes diseñado con ayuda de IA (ChatGPT y Gi
 
 1. **Ejecuta la colección** en Postman
 2. **Exporta los resultados** como archivo JSON
-3. **Abre `Visualizador_v3.html`** en tu navegador
+3. **Abre `Visualizador.html`** en tu navegador
 4. **Carga el JSON** de resultados y analiza visualmente
 
 ## ✨ Características del Visualizador
